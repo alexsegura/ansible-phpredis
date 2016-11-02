@@ -35,22 +35,20 @@
     - phpredis
     - phpredis-checkout
 
-- name: build deb file
-  shell: >
-    /var/lib/ansible/phpredis/checkouts/phpredis/mkdeb.sh &&
-    mv /var/lib/ansible/phpredis/checkouts/phpredis/$(ls -t phpredis-*.deb | head -1) /var/lib/ansible/phpredis/checkouts/phpredis-{{ phpredis_version }}_{{ ansible_machine }}.deb
+- name: build extension
+  shell: phpize && ./configure
   args:
     chdir: "/var/lib/ansible/phpredis/checkouts/phpredis"
-    creates: "/var/lib/ansible/phpredis/checkouts/phpredis-{{ phpredis_version }}_{{ ansible_machine }}.deb"
   register: result
   tags:
     - configuration
     - phpredis
     - phpredis-build-deb
 
-- name: install deb file
-  apt:
-    deb: "/var/lib/ansible/phpredis/checkouts/phpredis-{{ phpredis_version }}_{{ ansible_machine }}.deb"
+- name: install extension
+  shell: make && make install
+  args:
+    chdir: "/var/lib/ansible/phpredis/checkouts/phpredis"
   tags:
     - configuration
     - phpredis
